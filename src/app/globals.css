@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #060403;
+  /* Softest warm black */
+  --color-foreground: #f4ede8;
+
+  --color-neon-blue: #FF7B00;
+  /* Saffron/Orange */
+  --color-neon-cyan: #FFB347;
+  /* Warm Gold */
+
+  --color-glass-base: rgba(255, 230, 210, 0.02);
+  --color-glass-border: rgba(255, 230, 210, 0.06);
+
+  --font-sans: var(--font-poppins);
+  --font-serif: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #060403;
+  --foreground: #f4ede8;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  overscroll-behavior: none;
+}
+
+/* Glassmorphism utility classes */
+@layer utilities {
+  .glass-panel {
+    @apply bg-[var(--color-glass-base)] border border-[var(--color-glass-border)] backdrop-blur-xl rounded-2xl;
+  }
+
+  .glass-card {
+    @apply bg-black/40 border border-white/5 backdrop-blur-lg rounded-xl shadow-2xl shadow-black/50;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(255, 123, 0, 0.5), 0 0 20px rgba(255, 179, 71, 0.3);
+  }
+
+  .box-glow {
+    box-shadow: 0 0 20px rgba(255, 123, 0, 0.4), inset 0 0 10px rgba(255, 179, 71, 0.1);
+  }
 }
