@@ -63,29 +63,29 @@ export default function MenuList({ onAddToCart }: MenuListProps) {
                     viewport={{ once: true, margin: "-100px" }}
                     className="flex flex-col gap-8"
                 >
-                    <motion.h2 variants={itemVariants as any} className="text-3xl md:text-5xl font-serif font-medium tracking-wide text-white border-b border-white/10 pb-4">
+                    <motion.h2 variants={itemVariants as any} className="text-2xl sm:text-3xl md:text-5xl font-serif font-medium tracking-wide text-white border-b border-white/10 pb-2 sm:pb-4">
                         {category.title}
                     </motion.h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         {category.items.map((item) => (
                             <motion.div
                                 key={item.id}
                                 variants={itemVariants as any}
                                 whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
-                                className="glass-card p-6 flex flex-col justify-between group cursor-pointer transition-colors duration-300"
+                                className="glass-card p-4 sm:p-6 flex flex-col justify-between group cursor-pointer transition-colors duration-300 h-full"
                             >
                                 <div>
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h3 className="text-xl font-serif font-medium tracking-wide text-white group-hover:text-neon-cyan transition-colors">{item.name}</h3>
-                                        <span className="text-lg font-light text-white/80">{item.price}</span>
+                                    <div className="flex justify-between items-start mb-2 gap-4">
+                                        <h3 className="text-lg sm:text-xl font-serif font-medium tracking-wide text-white group-hover:text-neon-cyan transition-colors leading-tight">{item.name}</h3>
+                                        <span className="text-base sm:text-lg font-light text-white/80 whitespace-nowrap">{item.price}</span>
                                     </div>
                                     <p className="text-sm text-white/50">{item.desc}</p>
                                 </div>
 
                                 <button
                                     onClick={() => onAddToCart(item)}
-                                    className="mt-6 self-start px-6 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-neon-blue/20 hover:border-neon-blue hover:text-white hover:box-glow transition-all duration-300 flex items-center gap-2 text-sm"
+                                    className="mt-4 sm:mt-6 self-start px-5 sm:px-6 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-neon-blue/20 hover:border-neon-blue hover:text-white hover:box-glow transition-all duration-300 flex items-center gap-2 text-sm w-full sm:w-auto justify-center sm:justify-start"
                                 >
                                     <span className="font-medium">+ Add</span>
                                 </button>

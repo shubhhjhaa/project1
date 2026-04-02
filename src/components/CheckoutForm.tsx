@@ -57,7 +57,7 @@ export default function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
                             required
                             type="text"
                             id="name"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-6 pb-2 text-white outline-none focus:border-neon-cyan focus:bg-white/10 transition-all peer"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-6 pb-2 text-white outline-none focus:border-neon-cyan focus:bg-white/10 transition-all peer text-[16px]"
                             placeholder=" "
                             value={formData.name}
                             onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -72,7 +72,7 @@ export default function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
                             required
                             type="tel"
                             id="phone"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-6 pb-2 text-white outline-none focus:border-neon-cyan focus:bg-white/10 transition-all peer"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-6 pb-2 text-white outline-none focus:border-neon-cyan focus:bg-white/10 transition-all peer text-[16px]"
                             placeholder=" "
                             value={formData.phone}
                             onChange={e => setFormData({ ...formData, phone: e.target.value })}
@@ -87,7 +87,7 @@ export default function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
                             required
                             type="text"
                             id="table"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-6 pb-2 text-white outline-none focus:border-neon-cyan focus:bg-white/10 transition-all peer"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-6 pb-2 text-white outline-none focus:border-neon-cyan focus:bg-white/10 transition-all peer text-[16px]"
                             placeholder=" "
                             value={formData.table}
                             onChange={e => setFormData({ ...formData, table: e.target.value })}

@@ -88,16 +88,15 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
                     />
 
-                    {/* Cart Panel */}
                     <motion.div
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="fixed top-0 right-0 h-full w-full max-w-md glass-panel !rounded-none z-50 flex flex-col border-l border-white/10"
+                        className="fixed top-0 right-0 h-full w-full sm:max-w-md glass-panel !rounded-none z-50 flex flex-col border-l-0 sm:border-l border-white/10"
                     >
                         {/* Header */}
-                        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                        <div className="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center">
                             <h2 className="text-2xl font-serif font-medium tracking-wide text-white">Your Order</h2>
                             <button
                                 onClick={onClose}
@@ -108,7 +107,7 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                         </div>
 
                         {/* Items list */}
-                        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+                        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4">
                             <AnimatePresence>
                                 {cartItems.length === 0 ? (
                                     <motion.div
@@ -138,7 +137,7 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                                                     whileTap={{ scale: 0.9 }}
                                                     whileHover={{ backgroundColor: "rgba(255, 123, 0, 0.2)" }}
                                                     onClick={() => onUpdateQuantity(item.id, (item.quantity || 1) - 1)}
-                                                    className="w-7 h-7 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
                                                 >
                                                     –
                                                 </motion.button>
@@ -149,7 +148,7 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                                                     whileTap={{ scale: 0.9 }}
                                                     whileHover={{ backgroundColor: "rgba(255, 123, 0, 0.2)" }}
                                                     onClick={() => onUpdateQuantity(item.id, (item.quantity || 1) + 1)}
-                                                    className="w-7 h-7 rounded-full flex items-center justify-center text-neon-blue hover:text-white transition-colors cursor-pointer"
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center text-neon-blue hover:text-white transition-colors cursor-pointer"
                                                 >
                                                     +
                                                 </motion.button>
@@ -162,7 +161,7 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
 
                         {/* Coupon Section */}
                         {cartItems.length > 0 && !appliedCoupon && (
-                            <div className="px-6 py-4 border-t border-white/10 bg-white/5">
+                            <div className="px-4 sm:px-6 py-4 border-t border-white/10 bg-white/5">
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
@@ -195,8 +194,8 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                         )}
 
                         {appliedCoupon && (
-                            <div className="px-6 py-4 border-t border-white/10 bg-white/5">
-                                <div className="flex justify-between items-center bg-black/30 p-4 rounded-xl border border-white/10">
+                            <div className="px-4 sm:px-6 py-4 border-t border-white/10 bg-white/5">
+                                <div className="flex justify-between items-center bg-black/30 p-3 sm:p-4 rounded-xl border border-white/10">
                                     <div>
                                         {couponStatus?.type === 'success' && (
                                             <p className="text-green-400 text-xs font-medium mb-1">Coupon applied successfully</p>
@@ -214,7 +213,7 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
 
                         {/* Footer / Checkout */}
                         {cartItems.length > 0 && (
-                            <div className="p-6 border-t border-white/10 bg-black/40">
+                            <div className="p-4 sm:p-6 border-t border-white/10 bg-black/40">
                                 {appliedCoupon && (
                                     <div className="flex justify-between items-center mb-2 text-sm text-white/50">
                                         <span>Subtotal</span>
@@ -261,9 +260,9 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                                     animate={{ y: 0 }}
                                     exit={{ y: "100%" }}
                                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                                    className="absolute inset-x-0 bottom-0 top-1/4 bg-[#050505] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] z-50 flex flex-col rounded-t-3xl border border-white/10 border-b-0"
+                                    className="absolute inset-x-0 bottom-0 top-1/4 bg-[#050505] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] z-50 flex flex-col rounded-t-3xl border border-white/10 border-b-0 max-h-[85vh] sm:max-h-full"
                                 >
-                                    <div className="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#050505]/95 backdrop-blur-md rounded-t-3xl">
+                                    <div className="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#050505]/95 backdrop-blur-md rounded-t-3xl">
                                         <h3 className="text-xl font-serif text-white font-medium">Available Offers</h3>
                                         <button
                                             onClick={() => setIsOffersModalOpen(false)}
@@ -273,7 +272,7 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                                         </button>
                                     </div>
 
-                                    <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+                                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 pb-[max(env(safe-area-inset-bottom),20px)]">
                                         {[
                                             { code: 'WELCOME50', desc: 'Flat ₹50 OFF on your order' },
                                             { code: 'ZAIKA10', desc: '10% OFF your entire bill' },
