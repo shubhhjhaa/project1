@@ -1,0 +1,112 @@
+{
+    "menu": [
+        {
+            "title": "Starters",
+            "items": [
+                {
+                    "id": 101,
+                    "name": "Tandoori Paneer Tikka",
+                    "price": "₹249",
+                    "desc": "Charcoal smoked paneer with secret Indian spices"
+                },
+                {
+                    "id": 102,
+                    "name": "Crispy Veg Manchurian",
+                    "price": "₹199",
+                    "desc": "Desi-Chinese style crispy vegetable dumplings"
+                }
+            ]
+        },
+        {
+            "title": "Main Course",
+            "items": [
+                {
+                    "id": 201,
+                    "name": "Zaika Butter Chicken",
+                    "price": "₹349",
+                    "desc": "Rich, creamy butter chicken cooked with authentic Indian spices"
+                },
+                {
+                    "id": 202,
+                    "name": "Smoked Dal Makhani",
+                    "price": "₹249",
+                    "desc": "Slow-cooked black lentils prepared over 24 hours"
+                },
+                {
+                    "id": 203,
+                    "name": "Awadhi Dum Biryani",
+                    "price": "₹399",
+                    "desc": "Fragrant basmati rice layered with aromatic saffron and spices"
+                }
+            ]
+        },
+        {
+            "title": "Breads",
+            "items": [
+                {
+                    "id": 301,
+                    "name": "Garlic Butter Naan",
+                    "price": "₹60",
+                    "desc": "Freshly prepared tandoori breads straight from the clay oven"
+                },
+                {
+                    "id": 302,
+                    "name": "Tandoori Roti",
+                    "price": "₹20",
+                    "desc": "Classic whole wheat flatbread baked in tandoor"
+                }
+            ]
+        },
+        {
+            "title": "Desserts & Beverages",
+            "items": [
+                {
+                    "id": 401,
+                    "name": "Saffron Rasmalai",
+                    "price": "₹149",
+                    "desc": "Soft cottage cheese dumplings soaked in saffron milk"
+                },
+                {
+                    "id": 402,
+                    "name": "Royal Patiala Lassi",
+                    "price": "₹99",
+                    "desc": "Thick, creamy yogurt blend garnished with dry fruits"
+                }
+            ]
+        }
+    ],
+    "coupons": [
+        {
+            "code": "WELCOME50",
+            "type": "flat",
+            "value": 50,
+            "minOrder": 0,
+            "desc": "Flat ₹50 OFF on your order",
+            "active": true
+        },
+        {
+            "code": "ZAIKA10",
+            "type": "percent",
+            "value": 10,
+            "minOrder": 0,
+            "desc": "10% OFF your entire bill",
+            "active": true
+        },
+        {
+            "code": "PARTY20",
+            "type": "percent",
+            "value": 20,
+            "minOrder": 999,
+            "desc": "20% OFF on orders above ₹999",
+            "active": true
+        },
+        {
+            "code": "CHEFCHOICE",
+            "type": "item",
+            "value": "chef-dessert",
+            "minOrder": 0,
+            "desc": "Free Gulab Jamun included",
+            "active": true
+        }
+    ]
+}

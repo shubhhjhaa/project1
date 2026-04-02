@@ -1,38 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-
-const MENU_CATEGORIES = [
-    {
-        title: "Starters",
-        items: [
-            { id: 101, name: "Tandoori Paneer Tikka", price: "₹249", desc: "Charcoal smoked paneer with secret Indian spices" },
-            { id: 102, name: "Crispy Veg Manchurian", price: "₹199", desc: "Desi-Chinese style crispy vegetable dumplings" },
-        ]
-    },
-    {
-        title: "Main Course",
-        items: [
-            { id: 201, name: "Zaika Butter Chicken", price: "₹349", desc: "Rich, creamy butter chicken cooked with authentic Indian spices" },
-            { id: 202, name: "Smoked Dal Makhani", price: "₹249", desc: "Slow-cooked black lentils prepared over 24 hours" },
-            { id: 203, name: "Awadhi Dum Biryani", price: "₹399", desc: "Fragrant basmati rice layered with aromatic saffron and spices" },
-        ]
-    },
-    {
-        title: "Breads",
-        items: [
-            { id: 301, name: "Garlic Butter Naan", price: "₹60", desc: "Freshly prepared tandoori breads straight from the clay oven" },
-            { id: 302, name: "Tandoori Roti", price: "₹20", desc: "Classic whole wheat flatbread baked in tandoor" }
-        ]
-    },
-    {
-        title: "Desserts & Beverages",
-        items: [
-            { id: 401, name: "Saffron Rasmalai", price: "₹149", desc: "Soft cottage cheese dumplings soaked in saffron milk" },
-            { id: 402, name: "Royal Patiala Lassi", price: "₹99", desc: "Thick, creamy yogurt blend garnished with dry fruits" }
-        ]
-    }
-];
+import { motion, AnimatePresence } from "framer-motion";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -48,13 +16,16 @@ const itemVariants = {
 };
 
 interface MenuListProps {
+    menuData: any[];
+    cartItems: any[];
+    onUpdateQuantity: (id: string | number, newQuantity: number) => void;
     onAddToCart: (item: any) => void;
 }
 
-export default function MenuList({ onAddToCart }: MenuListProps) {
+export default function MenuList({ menuData, cartItems, onUpdateQuantity, onAddToCart }: MenuListProps) {
     return (
         <div className="w-full flex flex-col gap-24 pointer-events-auto">
-            {MENU_CATEGORIES.map((category, idx) => (
+            {menuData.map((category, idx) => (
                 <motion.div
                     key={idx}
                     variants={containerVariants}
@@ -68,7 +39,7 @@ export default function MenuList({ onAddToCart }: MenuListProps) {
                     </motion.h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                        {category.items.map((item) => (
+                        {category.items.map((item: any) => (
                             <motion.div
                                 key={item.id}
                                 variants={itemVariants as any}
@@ -83,12 +54,53 @@ export default function MenuList({ onAddToCart }: MenuListProps) {
                                     <p className="text-sm text-white/50">{item.desc}</p>
                                 </div>
 
-                                <button
-                                    onClick={() => onAddToCart(item)}
-                                    className="mt-4 sm:mt-6 self-start px-5 sm:px-6 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-neon-blue/20 hover:border-neon-blue hover:text-white hover:box-glow transition-all duration-300 flex items-center gap-2 text-sm w-full sm:w-auto justify-center sm:justify-start"
-                                >
-                                    <span className="font-medium">+ Add</span>
-                                </button>
+                                <div className="mt-4 sm:mt-6 h-10 flex">
+                                    <AnimatePresence mode="wait">
+                                        {(() => {
+                                            const cartItem = cartItems.find((i) => i.id === item.id);
+                                            const quantity = cartItem?.quantity || 0;
+
+                                            if (quantity > 0) {
+                                                return (
+                                                    <motion.div
+                                                        key="stepper"
+                                                        initial={{ scale: 0.9, opacity: 0 }}
+                                                        animate={{ scale: 1, opacity: 1 }}
+                                                        exit={{ scale: 0.9, opacity: 0 }}
+                                                        className="flex items-center bg-black/50 rounded-full border border-white/20 p-1 w-full sm:w-auto h-10 shadow-inner overflow-hidden"
+                                                    >
+                                                        <motion.button
+                                                            whileTap={{ scale: 0.8 }}
+                                                            whileHover={{ backgroundColor: "rgba(255, 123, 0, 0.2)" }}
+                                                            onClick={(e) => { e.stopPropagation(); onUpdateQuantity(item.id, quantity - 1); }}
+                                                            className="flex-1 sm:w-10 h-full rounded-full flex items-center justify-center text-white/70 hover:text-white"
+                                                        >–</motion.button>
+                                                        <span className="text-white text-sm font-medium w-8 text-center select-none">{quantity}</span>
+                                                        <motion.button
+                                                            whileTap={{ scale: 0.8 }}
+                                                            whileHover={{ backgroundColor: "rgba(255, 123, 0, 0.2)" }}
+                                                            onClick={(e) => { e.stopPropagation(); onUpdateQuantity(item.id, quantity + 1); }}
+                                                            className="flex-1 sm:w-10 h-full rounded-full flex items-center justify-center text-neon-blue hover:text-white"
+                                                        >+</motion.button>
+                                                    </motion.div>
+                                                );
+                                            }
+
+                                            return (
+                                                <motion.button
+                                                    key="add"
+                                                    initial={{ scale: 0.9, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    exit={{ scale: 0.9, opacity: 0 }}
+                                                    onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
+                                                    className="px-5 sm:px-6 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-neon-blue/20 hover:border-neon-blue hover:text-white hover:box-glow transition-all duration-300 flex items-center gap-2 text-sm w-full sm:w-auto justify-center sm:justify-start h-10"
+                                                >
+                                                    <span className="font-medium">+ Add</span>
+                                                </motion.button>
+                                            );
+                                        })()}
+                                    </AnimatePresence>
+                                </div>
                             </motion.div>
                         ))}
                     </div>

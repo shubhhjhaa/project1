@@ -7,12 +7,13 @@ interface CartProps {
     isOpen: boolean;
     onClose: () => void;
     cartItems: any[];
+    couponsData: any[];
     onUpdateQuantity: (id: string | number, newQuantity: number) => void;
     onAddToCart: (item: any) => void;
     onCheckout: () => void;
 }
 
-export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onAddToCart, onCheckout }: CartProps) {
+export default function Cart({ isOpen, onClose, cartItems, couponsData, onUpdateQuantity, onAddToCart, onCheckout }: CartProps) {
     const [couponInput, setCouponInput] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
     const [couponStatus, setCouponStatus] = useState<{ msg: string; type: "success" | "error" } | null>(null);
@@ -20,21 +21,23 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
 
     const subtotal = cartItems.reduce((acc, item) => acc + parseFloat(item.price.replace('₹', '')) * (item.quantity || 1), 0);
 
-    // Watch for PARTY20 drops boundary condition
+    const activeCoupon = couponsData.find(c => c.code === appliedCoupon && c.active);
+
+    // Watch for dropping below minimum order constraints
     useEffect(() => {
-        if (appliedCoupon === 'PARTY20' && subtotal <= 999 && subtotal > 0) {
+        if (activeCoupon && activeCoupon.minOrder > 0 && subtotal <= activeCoupon.minOrder && subtotal > 0) {
             setAppliedCoupon(null);
-            setCouponStatus({ msg: "PARTY20 removed. Order subtotal fell below ₹999", type: "error" });
+            setCouponStatus({ msg: `${activeCoupon.code} removed. Minimum order ₹${activeCoupon.minOrder}`, type: "error" });
         }
-    }, [subtotal, appliedCoupon]);
+    }, [subtotal, activeCoupon]);
 
     let discount = 0;
-    if (appliedCoupon === 'WELCOME50') {
-        discount = 50;
-    } else if (appliedCoupon === 'ZAIKA10') {
-        discount = subtotal * 0.1;
-    } else if (appliedCoupon === 'PARTY20') {
-        discount = subtotal * 0.2;
+    if (activeCoupon) {
+        if (activeCoupon.type === 'flat') {
+            discount = activeCoupon.value;
+        } else if (activeCoupon.type === 'percent') {
+            discount = subtotal * (activeCoupon.value / 100);
+        }
     }
 
     const finalTotal = Math.max(0, subtotal - discount);
@@ -43,19 +46,21 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
         const uppercaseCode = code.toUpperCase();
         setCouponStatus(null);
 
-        if (uppercaseCode === 'WELCOME50' || uppercaseCode === 'ZAIKA10' || uppercaseCode === 'PARTY20' || uppercaseCode === 'CHEFCHOICE') {
-            if (uppercaseCode === 'PARTY20' && subtotal <= 999) {
-                setCouponStatus({ msg: "PARTY20 is valid on orders above ₹999", type: "error" });
+        const matched = couponsData.find(c => c.code === uppercaseCode && c.active);
+
+        if (matched) {
+            if (matched.minOrder > 0 && subtotal < matched.minOrder) {
+                setCouponStatus({ msg: `Valid on orders above ₹${matched.minOrder}`, type: "error" });
                 return;
             }
 
             // Remove existing free dessert if we're swapping coupons
-            if (appliedCoupon === 'CHEFCHOICE' && uppercaseCode !== 'CHEFCHOICE') {
-                onUpdateQuantity('chef-dessert', 0);
+            if (activeCoupon && activeCoupon.type === 'item') {
+                onUpdateQuantity(activeCoupon.value, 0);
             }
 
-            if (uppercaseCode === 'CHEFCHOICE' && appliedCoupon !== 'CHEFCHOICE') {
-                onAddToCart({ id: 'chef-dessert', name: 'Gulab Jamun (Chef\'s Choice)', price: '₹0', quantity: 1 });
+            if (matched.type === 'item') {
+                onAddToCart({ id: matched.value, name: 'Free Reward', price: '₹0', quantity: 1 });
             }
 
             setAppliedCoupon(uppercaseCode);
@@ -63,13 +68,13 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
             setCouponStatus({ msg: "Coupon applied successfully", type: "success" });
             setIsOffersModalOpen(false);
         } else {
-            setCouponStatus({ msg: "Invalid coupon code", type: "error" });
+            setCouponStatus({ msg: "Invalid or inactive coupon code", type: "error" });
         }
     };
 
     const handleRemoveCoupon = () => {
-        if (appliedCoupon === 'CHEFCHOICE') {
-            onUpdateQuantity('chef-dessert', 0);
+        if (activeCoupon && activeCoupon.type === 'item') {
+            onUpdateQuantity(activeCoupon.value, 0);
         }
         setAppliedCoupon(null);
         setCouponStatus(null);
@@ -226,10 +231,10 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                                         <span>-₹{discount.toFixed(2)}</span>
                                     </div>
                                 )}
-                                {appliedCoupon && discount === 0 && appliedCoupon === 'CHEFCHOICE' && (
+                                {activeCoupon && discount === 0 && activeCoupon.type === 'item' && (
                                     <div className="flex justify-between items-center mb-4 text-sm text-green-400">
                                         <span>Discount</span>
-                                        <span>FREE DESSERT</span>
+                                        <span>FREE ITEM</span>
                                     </div>
                                 )}
 
@@ -273,12 +278,7 @@ export default function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onA
                                     </div>
 
                                     <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 pb-[max(env(safe-area-inset-bottom),20px)]">
-                                        {[
-                                            { code: 'WELCOME50', desc: 'Flat ₹50 OFF on your order' },
-                                            { code: 'ZAIKA10', desc: '10% OFF your entire bill' },
-                                            { code: 'PARTY20', desc: '20% OFF on orders above ₹999' },
-                                            { code: 'CHEFCHOICE', desc: 'Free Gulab Jamun included' }
-                                        ].map(offer => (
+                                        {couponsData.filter(c => c.active).map(offer => (
                                             <div key={offer.code} className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-center group hover:bg-white/[0.07] transition-colors">
                                                 <div>
                                                     <p className="font-mono text-white font-semibold mb-1 tracking-wider">{offer.code}</p>

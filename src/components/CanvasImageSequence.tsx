@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useScroll, useMotionValueEvent, motion, AnimatePresence } from "framer-motion";
 
-const FRAME_COUNT = 240;
-
 const padFrame = (num: number) => {
     return num.toString().padStart(3, "0");
 };
@@ -16,13 +14,31 @@ export default function CanvasImageSequence() {
 
     const { scrollYProgress } = useScroll();
 
+    const [isMobile, setIsMobile] = useState(false);
+    const [config, setConfig] = useState<{ frameCount: number, pathPrefix: string, ext: string } | null>(null);
+
+    useEffect(() => {
+        const mobile = window.innerWidth < 768;
+        setIsMobile(mobile);
+        setConfig(mobile ? {
+            frameCount: 40,
+            pathPrefix: '/frames-mobile/frame-',
+            ext: '.webp'
+        } : {
+            frameCount: 240,
+            pathPrefix: '/frames/ezgif-frame-',
+            ext: '.png'
+        });
+    }, []);
+
     // Preload Images
     useEffect(() => {
+        if (!config) return;
         let imagesLoaded = 0;
         const preload = () => {
-            for (let i = 1; i <= FRAME_COUNT; i++) {
+            for (let i = 1; i <= config.frameCount; i++) {
                 const img = new Image();
-                img.src = `/frames/ezgif-frame-${padFrame(i)}.png`;
+                img.src = `${config.pathPrefix}${padFrame(i)}${config.ext}`;
                 img.onload = () => {
                     imagesLoaded++;
                     setLoaded(imagesLoaded);
@@ -32,20 +48,24 @@ export default function CanvasImageSequence() {
             }
         };
         preload();
-    }, []);
+    }, [config]);
 
     // Render Frame function
-    const renderFrame = (index: number) => {
-        if (!canvasRef.current || !imagesRef.current[index]) return;
+    const renderFrame = (progressVal: number) => {
+        if (!canvasRef.current || !config) return;
         const ctx = canvasRef.current.getContext("2d");
         if (!ctx) return;
 
-        const img = imagesRef.current[index];
+        const baseIndex = Math.max(1, Math.min(config.frameCount, Math.floor(progressVal)));
+        let nextIndex = Math.min(config.frameCount, baseIndex + 1);
+        const blend = progressVal - baseIndex;
 
-        // Maintain aspect ratio while covering the canvas
+        const img1 = imagesRef.current[baseIndex];
+        const img2 = imagesRef.current[nextIndex];
+
+        if (!img1) return;
+
         const canvas = canvasRef.current;
-
-        // Scale canvas to device pixel ratio for sharp rendering
         const dpr = window.devicePixelRatio || 1;
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
@@ -54,44 +74,49 @@ export default function CanvasImageSequence() {
         const canvasWidth = window.innerWidth;
         const canvasHeight = window.innerHeight;
 
-        const scale = Math.max(
-            canvasWidth / img.width,
-            canvasHeight / img.height
-        );
-
-        const x = (canvasWidth / 2) - (img.width / 2) * scale;
-        const y = (canvasHeight / 2) - (img.height / 2) * scale;
+        const drawCtx = (img: HTMLImageElement, alpha: number) => {
+            if (!img || !img.complete) return;
+            const scale = Math.max(
+                canvasWidth / img.width,
+                canvasHeight / img.height
+            );
+            const x = (canvasWidth / 2) - (img.width / 2) * scale;
+            const y = (canvasHeight / 2) - (img.height / 2) * scale;
+            ctx.globalAlpha = alpha;
+            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        };
 
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+        if (isMobile && blend > 0.05 && img2 && baseIndex !== nextIndex) {
+            drawCtx(img1, 1);
+            drawCtx(img2, blend);
+        } else {
+            drawCtx(img1, 1);
+        }
+        ctx.globalAlpha = 1.0;
     };
 
-    // Sync scroll with frame
+    // Sync scroll with frame interpolation
     useMotionValueEvent(scrollYProgress, "change", (latest) => {
-        // Map 0 -> 1 progress to 1 -> 240 index linearly
-        const frameIndex = Math.min(
-            FRAME_COUNT,
-            Math.max(1, Math.ceil(latest * FRAME_COUNT))
-        );
-        // Request animation frame for smooth execution
-        requestAnimationFrame(() => renderFrame(frameIndex));
+        if (!config) return;
+        const progressVal = 1 + latest * (config.frameCount - 1);
+        requestAnimationFrame(() => renderFrame(progressVal));
     });
 
-    // Handle Resize
+    // Handle Resize boundaries
     useEffect(() => {
         const handleResize = () => {
+            if (!config) return;
             const latest = scrollYProgress.get();
-            const frameIndex = Math.min(
-                FRAME_COUNT,
-                Math.max(1, Math.ceil(latest * FRAME_COUNT))
-            );
-            renderFrame(frameIndex);
+            const progressVal = 1 + latest * (config.frameCount - 1);
+            renderFrame(progressVal);
         };
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, [scrollYProgress]);
+    }, [scrollYProgress, config, isMobile]);
 
-    const progress = Math.min((loaded / Math.ceil(FRAME_COUNT * 0.1)) * 100, 100);
+    const progress = Math.min((loaded / Math.ceil((config?.frameCount || 240) * 0.1)) * 100, 100);
 
     return (
         <>

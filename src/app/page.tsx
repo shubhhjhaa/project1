@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { io } from "socket.io-client";
 import CanvasImageSequence from "@/components/CanvasImageSequence";
 import Menu3D from "@/components/Menu3D";
 import MenuList from "@/components/MenuList";
@@ -11,9 +12,20 @@ import SuccessScreen from "@/components/SuccessScreen";
 
 export default function Home() {
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const [menuData, setMenuData] = useState<any[]>([]);
+  const [couponsData, setCouponsData] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    const socket = io();
+    socket.on("app_data", (db: any) => {
+      setMenuData(db.menu || []);
+      setCouponsData(db.coupons || []);
+    });
+    return () => { socket.disconnect(); };
+  }, []);
 
   const handleAddToCart = (item: any) => {
     setCartItems(prev => {
@@ -70,6 +82,7 @@ export default function Home() {
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
+        couponsData={couponsData}
         onUpdateQuantity={handleUpdateQuantity}
         onAddToCart={handleAddToCart}
         onCheckout={startCheckout}
@@ -78,6 +91,7 @@ export default function Home() {
       <AnimatePresence>
         {isCheckoutOpen && (
           <CheckoutForm
+            cartItems={cartItems}
             onBack={() => { setIsCheckoutOpen(false); setIsCartOpen(true); }}
             onSuccess={handleOrderSuccess}
           />
@@ -130,7 +144,12 @@ export default function Home() {
 
       {/* Main Menu Items (Scrollable Content over the sequence) */}
       <div className="relative z-20 top-[150vh] px-4 sm:px-8 md:px-24 w-full max-w-7xl mx-auto flex flex-col gap-32 md:gap-48 pb-[100vh]">
-        <MenuList onAddToCart={handleAddToCart} />
+        <MenuList
+          menuData={menuData}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onAddToCart={handleAddToCart}
+        />
       </div>
 
     </main>

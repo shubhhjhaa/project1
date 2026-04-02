@@ -7,11 +7,12 @@ import { io } from "socket.io-client";
 let socket: any;
 
 interface CheckoutFormProps {
+    cartItems: any[];
     onBack: () => void;
     onSuccess: () => void;
 }
 
-export default function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
+export default function CheckoutForm({ cartItems, onBack, onSuccess }: CheckoutFormProps) {
     const [formData, setFormData] = useState({ name: "", phone: "", table: "", payment: "upi" });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,6 +27,7 @@ export default function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
         const newOrder = {
             id: Math.random().toString(36).substring(7),
             ...formData,
+            items: cartItems,
             time: new Date().toISOString(),
             status: "Preparing"
         };
