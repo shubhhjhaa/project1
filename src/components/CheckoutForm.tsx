@@ -45,7 +45,7 @@ export default function CheckoutForm({ cartItems, onBack, onSuccess }: CheckoutF
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 50, opacity: 0 }}
-            className="absolute inset-0 bg-black/90 backdrop-blur-xl z-50 p-6 flex flex-col justify-center items-center"
+            className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[60] p-6 flex flex-col justify-center items-center overflow-y-auto"
         >
             <div className="w-full max-w-md w-full relative">
                 <button onClick={onBack} className="absolute -top-12 left-0 text-white/50 hover:text-white transition-colors">
