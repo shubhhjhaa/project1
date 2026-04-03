@@ -23,6 +23,7 @@ export default function AdminDashboard() {
             .then(db => {
                 setMenuData(prev => prev.length ? prev : (db.menu || []));
                 setCouponsData(prev => prev.length ? prev : (db.coupons || []));
+                setOrders(prev => prev.length ? prev : (db.orders || []));
             })
             .catch(console.error);
 
@@ -31,10 +32,15 @@ export default function AdminDashboard() {
         socket.on("app_data", (db: any) => {
             setMenuData(db.menu || []);
             setCouponsData(db.coupons || []);
+            setOrders(prev => prev.length ? prev : (db.orders || []));
         });
 
         socket.on("order_update", (newOrder: any) => {
             setOrders(prev => [newOrder, ...prev]);
+        });
+
+        socket.on("order_status_updated", ({ id, status }: any) => {
+            setOrders(prev => prev.map(order => order.id === id ? { ...order, status } : order));
         });
 
         return () => {
@@ -44,6 +50,7 @@ export default function AdminDashboard() {
 
     const completeOrder = (id: string) => {
         setOrders(prev => prev.map(order => order.id === id ? { ...order, status: "Completed" } : order));
+        socket.emit("update_order_status", { id, status: "Completed" });
     };
 
     const handleAuth = (e: React.FormEvent) => {

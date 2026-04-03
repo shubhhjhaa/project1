@@ -158,7 +158,7 @@
       "value": 50,
       "minOrder": 0,
       "desc": "Flat ₹50 OFF on your order",
-      "active": false
+      "active": true
     },
     {
       "code": "ZAIKA10",

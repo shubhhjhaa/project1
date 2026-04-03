@@ -39,7 +39,27 @@ app.prepare().then(() => {
 
         socket.on('new_order', (orderData) => {
             console.log('Received new order:', orderData);
+            
+            // Persist order to database so it isn't lost if admin logs in later
+            const db = readDB();
+            if (!db.orders) db.orders = [];
+            // Prepend new orders so they appear at the top
+            db.orders.unshift(orderData);
+            writeDB(db);
+
             io.emit('order_update', orderData);
+        });
+
+        socket.on('update_order_status', ({ id, status }) => {
+            const db = readDB();
+            if (db.orders) {
+                const order = db.orders.find(o => o.id === id);
+                if (order) {
+                    order.status = status;
+                    writeDB(db);
+                }
+            }
+            io.emit('order_status_updated', { id, status });
         });
 
         socket.on('admin_update_menu', (newMenu) => {

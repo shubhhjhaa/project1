@@ -167,17 +167,17 @@ export default function Cart({ isOpen, onClose, cartItems, couponsData, onUpdate
                         {/* Coupon Section */}
                         {cartItems.length > 0 && !appliedCoupon && (
                             <div className="px-4 sm:px-6 py-4 border-t border-white/10 bg-white/5">
-                                <div className="flex gap-2">
+                                <div className="relative w-full">
                                     <input
                                         type="text"
                                         placeholder="Enter coupon code"
                                         value={couponInput}
                                         onChange={(e) => setCouponInput(e.target.value)}
-                                        className="flex-1 min-w-0 bg-black/50 border border-white/20 rounded-xl px-3 sm:px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-neon-cyan transition-colors uppercase text-sm"
+                                        className="w-full bg-black/50 border border-white/20 rounded-xl pl-4 pr-[90px] py-3 text-white placeholder-white/30 focus:outline-none focus:border-neon-cyan transition-colors uppercase text-sm"
                                     />
                                     <button
                                         onClick={() => handleApplyCoupon(couponInput)}
-                                        className="shrink-0 bg-white/10 hover:bg-white/20 text-white px-4 sm:px-6 py-3 rounded-xl transition-colors font-medium border border-white/10 text-sm"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 bg-white/10 hover:bg-white/20 text-white px-4 sm:px-6 rounded-lg transition-colors font-medium border border-white/10 text-sm flex items-center"
                                     >
                                         Apply
                                     </button>
