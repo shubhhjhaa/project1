@@ -75,10 +75,15 @@ export default function CanvasImageSequence() {
             const initialFrames = Math.min(5, config.frameCount);
             await Promise.all(Array.from({length: initialFrames}, (_, i) => loadFrame(i + 1)));
             
-            // Priority 2: Load remaining frames in background, sequentially to reduce network contention
-            for (let i = initialFrames + 1; i <= config.frameCount; i++) {
-                await loadFrame(i);
-                // Tiny delay on low-end devices to avoid freezing the UI thread
+            // Priority 2: Load remaining frames in parallel batches to overcome network latency on production
+            const batchSize = isLowEnd ? 5 : 20;
+            for (let i = initialFrames + 1; i <= config.frameCount; i += batchSize) {
+                const batch = [];
+                for (let j = 0; j < batchSize && (i + j) <= config.frameCount; j++) {
+                    batch.push(loadFrame(i + j));
+                }
+                await Promise.all(batch);
+                // Tiny delay on low-end devices to avoid freezing the UI thread completely
                 if (isLowEnd) await new Promise(r => setTimeout(r, 10)); 
             }
         };
