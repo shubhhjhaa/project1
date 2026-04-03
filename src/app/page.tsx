@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, cubicBezier } from "framer-motion";
 import { io } from "socket.io-client";
 import CanvasImageSequence from "@/components/CanvasImageSequence";
 import Menu3D from "@/components/Menu3D";
@@ -17,15 +17,32 @@ export default function Home() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+
     const socket = io();
     socket.on("app_data", (db: any) => {
       setMenuData(db.menu || []);
       setCouponsData(db.coupons || []);
     });
-    return () => { socket.disconnect(); };
+    return () => { 
+      socket.disconnect(); 
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
+
+  // Cinematic disappear effect hooks
+  const { scrollYProgress } = useScroll();
+  const easeCurve = cubicBezier(0.22, 1, 0.36, 1);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0], { ease: easeCurve });
+  const heroY = useTransform(scrollYProgress, [0, 0.25], [0, isMobile ? -30 : -60], { ease: easeCurve });
+  const heroScale = useTransform(scrollYProgress, [0, 0.25], [1, isMobile ? 0.98 : 0.96], { ease: easeCurve });
+  const heroBlur = useTransform(scrollYProgress, [0, 0.25], [0, isMobile ? 2 : 4], { ease: easeCurve });
+  const heroFilter = useTransform(heroBlur, (v) => `blur(${v}px)`);
 
   const handleAddToCart = (item: any) => {
     setCartItems(prev => {
@@ -102,10 +119,19 @@ export default function Home() {
         {isSuccess && <SuccessScreen />}
       </AnimatePresence>
 
-      {/* Hero Section Container (Fixed so it stays while scrolling the pseudo-height) */}
-      <div className="fixed inset-0 z-10 pointer-events-none flex flex-col pt-20 md:pt-24 px-4 sm:px-8 md:px-24">
-        {/* Hero Text */}
-        <div className="flex flex-col gap-4 md:gap-8 pointer-events-auto max-w-2xl mt-8 md:mt-12">
+      {/* Hero Section Container (Sticky so it stays while scrolling the pseudo-height) */}
+      <div className="sticky top-0 h-screen inset-x-0 z-10 pointer-events-none flex flex-col pt-20 md:pt-24 px-4 sm:px-8 md:px-24">
+        {/* Cinematic Disappearing Hero Text */}
+        <motion.div 
+          className="flex flex-col gap-4 md:gap-8 pointer-events-auto max-w-2xl mt-8 md:mt-12 origin-top-left"
+          style={{
+            opacity: heroOpacity,
+            y: heroY,
+            scale: heroScale,
+            filter: heroFilter,
+            willChange: "transform, opacity, filter"
+          }}
+        >
 
           <h1 className="w-full overflow-hidden block">
             <svg viewBox="0 0 600 110" className="w-full h-auto drop-shadow-sm overflow-visible">
@@ -134,7 +160,7 @@ export default function Home() {
           >
             Authentic desi flavors, crafted with passion and served with elegance.
           </motion.p>
-        </div>
+        </motion.div>
 
         {/* 3D Menu Interactive Layer */}
         <div className="absolute inset-0 top-[25%] sm:top-[20%] h-[55%] sm:h-[60%] pointer-events-auto">
