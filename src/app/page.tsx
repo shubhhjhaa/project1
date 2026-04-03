@@ -24,6 +24,16 @@ export default function Home() {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
 
+    // Initial HTTP fetch (Guarantees data loads on Vercel/Netlify)
+    fetch('/api/data')
+      .then(res => res.json())
+      .then(db => {
+        setMenuData(prev => prev.length ? prev : (db.menu || []));
+        setCouponsData(prev => prev.length ? prev : (db.coupons || []));
+      })
+      .catch(console.error);
+
+    // Attempt Socket connection for real-time updates (works locally/custom servers)
     const socket = io();
     socket.on("app_data", (db: any) => {
       setMenuData(db.menu || []);

@@ -17,6 +17,15 @@ export default function AdminDashboard() {
     const [couponsData, setCouponsData] = useState<any[]>([]);
 
     useEffect(() => {
+        // Initial HTTP fetch (Guarantees data loads on Serverless platforms for viewing)
+        fetch('/api/data')
+            .then(res => res.json())
+            .then(db => {
+                setMenuData(prev => prev.length ? prev : (db.menu || []));
+                setCouponsData(prev => prev.length ? prev : (db.coupons || []));
+            })
+            .catch(console.error);
+
         socket = io();
 
         socket.on("app_data", (db: any) => {
