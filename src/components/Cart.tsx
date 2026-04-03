@@ -173,11 +173,11 @@ export default function Cart({ isOpen, onClose, cartItems, couponsData, onUpdate
                                         placeholder="Enter coupon code"
                                         value={couponInput}
                                         onChange={(e) => setCouponInput(e.target.value)}
-                                        className="flex-1 bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-neon-cyan transition-colors uppercase text-sm"
+                                        className="flex-1 min-w-0 bg-black/50 border border-white/20 rounded-xl px-3 sm:px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-neon-cyan transition-colors uppercase text-sm"
                                     />
                                     <button
                                         onClick={() => handleApplyCoupon(couponInput)}
-                                        className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl transition-colors font-medium border border-white/10 text-sm"
+                                        className="shrink-0 bg-white/10 hover:bg-white/20 text-white px-4 sm:px-6 py-3 rounded-xl transition-colors font-medium border border-white/10 text-sm"
                                     >
                                         Apply
                                     </button>
